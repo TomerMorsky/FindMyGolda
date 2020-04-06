@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.findmygolda.network.BranchApi
+import com.example.findmygolda.network.BranchManager
 import com.example.findmygolda.network.BranchProperty
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,26 +23,27 @@ class MapViewModel : ViewModel() {
     val branches: LiveData<List<BranchProperty>>
         get() = _branches
 
+    private val _focusOnUserLocation = MutableLiveData<Boolean?>()
+    val focusOnUserLocation: LiveData<Boolean?>
+        get() = _focusOnUserLocation
+
+    private val _navigateToAlertsFragment = MutableLiveData<Boolean?>()
+    val navigateToAlertsFragment: LiveData<Boolean?>
+        get() = _navigateToAlertsFragment
+
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(
         viewModelJob + Dispatchers.Main )
+
+    private val branchManager = BranchManager()
 
     init {
         getGoldaBranches()
     }
 
-    private fun getGoldaBranches() {
+    fun getGoldaBranches() {
         coroutineScope.launch {
-            var getPropertiesDeferred =
-                BranchApi.retrofitService.getProperties()
-            try {
-                var listResult = getPropertiesDeferred.await()
-                _response.value =
-                    "Success: ${listResult.size} Mars properties retrieved"
-                _branches.value = listResult
-            } catch (e: Exception) {
-                _response.value = "Failure: ${e.message}"
-            }
+            _branches.value = branchManager.getGoldaBranches()
         }
     }
 
@@ -49,4 +51,22 @@ class MapViewModel : ViewModel() {
         super.onCleared()
         viewModelJob.cancel()
     }
+
+    fun onAlertsButtonClicked(){
+        _navigateToAlertsFragment.value = true
+    }
+
+    fun doneNavigateToAlertsFragment(){
+        _navigateToAlertsFragment.value = false;
+    }
+
+    fun focusOnUserLocationClicked(){
+        _focusOnUserLocation.value = true;
+    }
+
+    fun doneFocusOnUserLocation(){
+        _focusOnUserLocation.value = false;
+    }
+
+
 }

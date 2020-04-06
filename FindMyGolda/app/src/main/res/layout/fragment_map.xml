@@ -2,21 +2,62 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto">
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".map.MapFragment">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.findmygolda.map.MapViewModel" />
 
-        <!-- TODO: Update blank fragment layout -->
-        <com.mapbox.mapboxsdk.maps.MapView
-            android:id="@+id/mapView"
+    </data>
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            mapbox:mapbox_cameraTargetLat="32.085300"
-            mapbox:mapbox_cameraTargetLng="34.781769"
-            mapbox_renderTextureMode="true"
-            mapbox:mapbox_cameraZoom="9" />
+            tools:context=".map.MapFragment">
+
+            <com.mapbox.mapboxsdk.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                mapbox:mapbox_cameraTargetLat="32.085300"
+                mapbox:mapbox_cameraTargetLng="34.781769"
+                mapbox_renderTextureMode="true"
+                mapbox:mapbox_cameraZoom="9" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/focusOnUserLocationButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:src="@drawable/icon_focus_on_user_location"
+                android:onClick="@{() -> viewModel.focusOnUserLocationClicked()}"
+                android:clickable="true"
+                mapbox:backgroundTint="@color/primaryLightColor"
+                mapbox:layout_constraintBottom_toBottomOf="parent"
+                mapbox:layout_constraintEnd_toEndOf="parent"
+                mapbox:maxImageSize="45dp" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/alertsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:src="@drawable/icon_notifications"
+                android:onClick="@{() -> viewModel.onAlertsButtonClicked()}"
+                android:clickable="true"
+                mapbox:backgroundTint="@color/primaryLightColor"
+                mapbox:layout_constraintBottom_toTopOf="@+id/focusOnUserLocationButton"
+                mapbox:layout_constraintEnd_toEndOf="parent"
+                mapbox:maxImageSize="45dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    </FrameLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
 </layout>
