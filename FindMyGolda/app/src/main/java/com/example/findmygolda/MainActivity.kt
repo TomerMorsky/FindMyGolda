@@ -1,7 +1,10 @@
 package com.example.findmygolda
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
+import com.example.findmygolda.map.MapFragment
 
 class MainActivity : AppCompatActivity() {
 
