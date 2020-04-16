@@ -16,4 +16,7 @@ interface AlertDatabaseDAO {
 
     @Query("SELECT * FROM alerts ORDER BY id DESC LIMIT 1")
     fun getLastAlert(): AlertEntity?
+
+    @Query("SELECT * from alerts WHERE branchId = :branchId ORDER BY time DESC LIMIT 1")
+    fun getLastAlertOfBranch(branchId: Int): AlertEntity?
 }

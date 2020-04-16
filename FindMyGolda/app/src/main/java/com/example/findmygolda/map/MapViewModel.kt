@@ -1,21 +1,21 @@
 package com.example.findmygolda.map
 
+import android.app.Application
+import android.location.Location
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.findmygolda.network.BranchApi
+import com.example.findmygolda.alerts.NotificationHelper
+import com.example.findmygolda.database.AlertDatabase
+import com.example.findmygolda.database.AlertEntity
 import com.example.findmygolda.network.BranchManager
 import com.example.findmygolda.network.BranchProperty
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
+const val MIN_TIME_BETWEEN_ALERTS = 300000L
+class MapViewModel(val application: Application) : ViewModel() {
 
-class MapViewModel : ViewModel() {
     private val _response = MutableLiveData<String>()
-
-    // The external immutable LiveData for the response String
     val response: LiveData<String>
         get() = _response
 
@@ -47,6 +47,35 @@ class MapViewModel : ViewModel() {
         }
     }
 
+    fun alertIfNeeded(location: Location){
+        val branches = _branches.value
+        val dataSource = (AlertDatabase.getInstance(application)).alertDatabaseDAO
+        if (branches != null) {
+            for(branch in branches){
+                if(branchManager.isDistanceLessThen500Meters(location, branch)){
+                    coroutineScope.launch{
+                        withContext(Dispatchers.IO){
+                            // saving to the room
+                            val lastAlert = dataSource.getLastAlertOfBranch(branch.id.toInt())
+                            if(hasTimePast(lastAlert)){
+                                dataSource.insert(AlertEntity(title = branch.name,
+                                    description = branch.discounts,
+                                    branchId = branch.id.toInt()))
+                                NotificationHelper(application.applicationContext).createNotification(branch.name, branch.discounts)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun hasTimePast(lastAlert : AlertEntity?): Boolean {
+        if (lastAlert == null)
+            return true
+        return (System.currentTimeMillis() - lastAlert.time) >= MIN_TIME_BETWEEN_ALERTS
+    }
+
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
@@ -67,6 +96,5 @@ class MapViewModel : ViewModel() {
     fun doneFocusOnUserLocation(){
         _focusOnUserLocation.value = false;
     }
-
 
 }

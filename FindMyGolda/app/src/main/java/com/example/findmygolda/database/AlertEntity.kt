@@ -9,6 +9,6 @@ data class AlertEntity(
     val id: Long = 0L,
     val time: Long = System.currentTimeMillis(),
     val title: String,
-    val description: String
-
+    val description: String,
+    val branchId : Int
 )

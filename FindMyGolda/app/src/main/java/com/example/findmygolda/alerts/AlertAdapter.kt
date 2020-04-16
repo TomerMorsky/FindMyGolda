@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.findmygolda.R
 import com.example.findmygolda.database.AlertEntity
 import java.text.SimpleDateFormat
-import java.util.*
 
 class AlertAdapter: RecyclerView.Adapter<AlertAdapter.ViewHolder>() {
 
@@ -24,12 +23,10 @@ class AlertAdapter: RecyclerView.Adapter<AlertAdapter.ViewHolder>() {
         holder.bind(item)
     }
 
-
     override fun onCreateViewHolder(
         parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent)
     }
-
 
     class ViewHolder private constructor(itemView: View) : RecyclerView.ViewHolder(itemView){
         val alertTitle: TextView = itemView.findViewById(R.id.alert_title)
@@ -64,7 +61,5 @@ class AlertAdapter: RecyclerView.Adapter<AlertAdapter.ViewHolder>() {
         }
 
     }
-
-
 
 }

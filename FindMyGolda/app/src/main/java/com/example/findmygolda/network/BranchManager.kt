@@ -8,23 +8,22 @@ import kotlinx.coroutines.*
 import java.lang.Exception
 
 class BranchManager() {
-    private var branches = listOf<BranchProperty>()
-        get() = branches
-    private var map = MapFragment()
+     var branches = listOf<BranchProperty>()
+//        get() = branches
+//    private var map = MapFragment()
 
 
     init {
-        map.onTitleChanged= { oldValue, newValue ->
-            Log.i("change", "in locartion change")
-        }
+//        map.onTitleChanged= { oldValue, newValue ->
+//            Log.i("change", "in locartion change")
+//        }
     }
 
-    fun isBranchIn500(location: Location, branch: BranchProperty): Boolean{
-        val branchLocation = Location("branch")
+    fun isDistanceLessThen500Meters(location: Location, branch: BranchProperty): Boolean{
+        val branchLocation = Location("")
         branchLocation.latitude = branch.latitude
         branchLocation.longitude = branch.longtitude
-        val result = location!!.distanceTo(branchLocation) <= 500
-        return result
+        return (location!!.distanceTo(branchLocation) <= 500)
     }
 
     suspend fun getGoldaBranches(): List<BranchProperty>? {
