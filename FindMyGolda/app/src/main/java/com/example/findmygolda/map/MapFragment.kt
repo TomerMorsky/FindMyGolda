@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -24,7 +23,6 @@ import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
-import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
@@ -36,7 +34,7 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 
-class MapFragment : Fragment(), PermissionsListener, LocationEngineListener, OnMapReadyCallback {
+class MapFragment : Fragment(), LocationEngineListener, OnMapReadyCallback {
     lateinit var mapView: MapView
     lateinit var mapViewModel: MapViewModel
 
@@ -44,7 +42,6 @@ class MapFragment : Fragment(), PermissionsListener, LocationEngineListener, OnM
     var settingsClient: SettingsClient? = null
 
     lateinit var map: MapboxMap
-    lateinit var permissionManager: PermissionsManager
 
     var originLocation: Location? = null
 
@@ -100,7 +97,7 @@ class MapFragment : Fragment(), PermissionsListener, LocationEngineListener, OnM
         })
 
         mapView.getMapAsync(this)
-        settingsClient = LocationServices.getSettingsClient(activity)
+        settingsClient = LocationServices.getSettingsClient(this.activity!!)
 
         return binding.root
     }
@@ -152,21 +149,6 @@ class MapFragment : Fragment(), PermissionsListener, LocationEngineListener, OnM
         mapView.onSaveInstanceState(outState)
     }
 
-    override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
-        Toast.makeText(Mapbox.getApplicationContext(),
-            "This app needs location permission to be able to show your location on the map",
-            Toast.LENGTH_LONG).show()
-    }
-
-    override fun onPermissionResult(granted: Boolean) {
-        if (granted) {
-            enableLocation()
-        } else {
-            Toast.makeText(Mapbox.getApplicationContext(), "User location was not granted", Toast.LENGTH_LONG).show()
-            activity?.finish()
-        }
-    }
-
     override fun onLocationChanged(location: Location?) {
         location?.run {
             originLocation = this
@@ -210,21 +192,11 @@ class MapFragment : Fragment(), PermissionsListener, LocationEngineListener, OnM
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<out String>,
-                                            grantResults: IntArray) {
-        permissionManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
     fun enableLocation() {
         if (PermissionsManager.areLocationPermissionsGranted(activity)) {
             // Show the user location on map
             initializeLocationComponent()
             initializeLocationEngine()
-        } else {
-            // If there is no permissions ask for them
-            permissionManager = PermissionsManager(this)
-            permissionManager.requestLocationPermissions(activity)
         }
     }
 
@@ -264,4 +236,5 @@ class MapFragment : Fragment(), PermissionsListener, LocationEngineListener, OnM
         val point = LatLng(branch.latitude, branch.longtitude)
         map.addMarker(MarkerOptions().setTitle(branch.name).setSnippet(branch.address).position(point))
     }
+
 }

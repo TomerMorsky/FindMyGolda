@@ -52,7 +52,9 @@ dependencies {
     implementation"android.arch.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "android.arch.navigation:navigation-ui-ktx:$navigationVersion"
 
-    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.8.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.8.1'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
+
 
     implementation "com.squareup.retrofit2:retrofit:$version_retrofit"
     implementation "com.squareup.retrofit2:converter-scalars:$version_retrofit"
