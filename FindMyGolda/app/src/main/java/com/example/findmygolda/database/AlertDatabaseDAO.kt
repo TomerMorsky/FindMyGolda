@@ -3,6 +3,7 @@ package com.example.findmygolda.database
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 
@@ -19,4 +20,6 @@ interface AlertDatabaseDAO {
 
     @Query("SELECT * from alerts WHERE branchId = :branchId ORDER BY time DESC LIMIT 1")
     fun getLastAlertOfBranch(branchId: Int): AlertEntity?
+
+
 }

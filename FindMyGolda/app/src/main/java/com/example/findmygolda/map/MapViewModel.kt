@@ -5,12 +5,15 @@ import android.location.Location
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.findmygolda.BranchesRepository
 import com.example.findmygolda.alerts.NotificationHelper
 import com.example.findmygolda.database.AlertDatabase
 import com.example.findmygolda.database.AlertEntity
+import com.example.findmygolda.database.BranchEntity
 import com.example.findmygolda.network.BranchManager
 import com.example.findmygolda.network.BranchProperty
 import kotlinx.coroutines.*
+import java.lang.Exception
 
 const val MIN_TIME_BETWEEN_ALERTS = 300000L
 class MapViewModel(val application: Application) : ViewModel() {
@@ -19,9 +22,9 @@ class MapViewModel(val application: Application) : ViewModel() {
     val response: LiveData<String>
         get() = _response
 
-    private val _branches = MutableLiveData<List<BranchProperty>>()
-    val branches: LiveData<List<BranchProperty>>
-        get() = _branches
+//    private val _branches = MutableLiveData<List<BranchEntity>>()
+//    val branches: LiveData<List<BranchEntity>>
+//        get() = _branches
 
     private val _focusOnUserLocation = MutableLiveData<Boolean?>()
     val focusOnUserLocation: LiveData<Boolean?>
@@ -37,18 +40,28 @@ class MapViewModel(val application: Application) : ViewModel() {
 
     private val branchManager = BranchManager()
 
+    private val branchRepository = BranchesRepository(AlertDatabase.getInstance(application))
+    val branches = branchRepository.branches
+
+
+
     init {
         getGoldaBranches()
     }
 
     fun getGoldaBranches() {
         coroutineScope.launch {
-            _branches.value = branchManager.getGoldaBranches()
+            try {
+                branchRepository.refreshBranches()
+            } catch (e: Exception) {
+                // Probably no internet connection
+            }
+
         }
     }
 
     fun alertIfNeeded(location: Location){
-        val branches = _branches.value
+        val branches = branches.value
         val dataSource = (AlertDatabase.getInstance(application)).alertDatabaseDAO
         if (branches != null) {
             for(branch in branches){

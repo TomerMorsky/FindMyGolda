@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.findmygolda.database.AlertDatabaseDAO
-import com.example.findmygolda.database.AlertEntity
 import kotlinx.coroutines.*
 
 class AlertsViewModel(

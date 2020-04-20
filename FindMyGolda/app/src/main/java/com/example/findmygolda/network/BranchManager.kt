@@ -3,12 +3,13 @@ package com.example.findmygolda.network
 import android.location.Location
 import android.util.Log
 import androidx.lifecycle.Observer
+import com.example.findmygolda.database.BranchEntity
 import com.example.findmygolda.map.MapFragment
 import kotlinx.coroutines.*
 import java.lang.Exception
 
 class BranchManager() {
-     var branches = listOf<BranchProperty>()
+     var branches = listOf<BranchEntity>()
 //        get() = branches
 //    private var map = MapFragment()
 
@@ -19,16 +20,16 @@ class BranchManager() {
 //        }
     }
 
-    fun isDistanceLessThen500Meters(location: Location, branch: BranchProperty): Boolean{
+    fun isDistanceLessThen500Meters(location: Location, branch: BranchEntity): Boolean{
         val branchLocation = Location("")
         branchLocation.latitude = branch.latitude
         branchLocation.longitude = branch.longtitude
         return (location!!.distanceTo(branchLocation) <= 500)
     }
 
-    suspend fun getGoldaBranches(): List<BranchProperty>? {
+    suspend fun getGoldaBranches(): List<BranchEntity>? {
         return withContext(Dispatchers.IO) {
-            var listResult = listOf<BranchProperty>()
+            var listResult = listOf<BranchEntity>()
             val getBranchesDeferred = BranchApi.retrofitService.getProperties()
             try {
                 listResult = getBranchesDeferred.await()

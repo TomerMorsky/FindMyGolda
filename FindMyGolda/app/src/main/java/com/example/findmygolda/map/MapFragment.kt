@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.findmygolda.R
+import com.example.findmygolda.database.BranchEntity
 import com.example.findmygolda.databinding.FragmentMapBinding
 import com.example.findmygolda.network.BranchProperty
 import com.google.android.gms.common.api.ApiException
@@ -232,7 +233,7 @@ class MapFragment : Fragment(), LocationEngineListener, OnMapReadyCallback {
             location.longitude), 15.0))
     }
 
-    fun addGoldaMarker(branch: BranchProperty){
+    fun addGoldaMarker(branch: BranchEntity){
         val point = LatLng(branch.latitude, branch.longtitude)
         map.addMarker(MarkerOptions().setTitle(branch.name).setSnippet(branch.address).position(point))
     }

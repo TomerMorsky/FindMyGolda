@@ -1,5 +1,6 @@
 package com.example.findmygolda.network
 
+import com.example.findmygolda.database.BranchEntity
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -25,7 +26,7 @@ private val retrofit = Retrofit.Builder()
 interface BranchesApiService {
     @GET("branches.json")
     fun getProperties():
-            Deferred<List<BranchProperty>>
+            Deferred<List<BranchEntity>>
 }
 
 object BranchApi {

@@ -5,10 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [AlertEntity::class], version = 2, exportSchema = false)
+@Database(entities = [AlertEntity::class, BranchEntity :: class], version = 3, exportSchema = false)
 abstract class AlertDatabase : RoomDatabase() {
 
     abstract val alertDatabaseDAO: AlertDatabaseDAO
+    abstract val branchDatabaseDAO: BranchDatabaseDAO
 
     companion object {
 
@@ -23,7 +24,7 @@ abstract class AlertDatabase : RoomDatabase() {
                     instance = Room.databaseBuilder(
                             context.applicationContext,
                             AlertDatabase::class.java,
-                            "sleep_history_database"
+                            "database"
                         ).fallbackToDestructiveMigration()
                         .build()
                     INSTANCE = instance
