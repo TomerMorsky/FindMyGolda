@@ -12,11 +12,15 @@ import com.example.findmygolda.database.AlertEntity
 import com.example.findmygolda.database.BranchEntity
 import com.example.findmygolda.network.BranchManager
 import com.example.findmygolda.network.BranchProperty
+import com.mapbox.android.core.location.LocationEngine
+import com.mapbox.android.core.location.LocationEngineListener
+import com.mapbox.android.core.location.LocationEnginePriority
+import com.mapbox.android.core.location.LocationEngineProvider
 import kotlinx.coroutines.*
 import java.lang.Exception
 
 const val MIN_TIME_BETWEEN_ALERTS = 300000L
-class MapViewModel(val application: Application) : ViewModel() {
+class MapViewModel(val application: Application) : ViewModel(), LocationEngineListener {
 
     private val _response = MutableLiveData<String>()
     val response: LiveData<String>
@@ -43,16 +47,20 @@ class MapViewModel(val application: Application) : ViewModel() {
     private val branchRepository = BranchesRepository(AlertDatabase.getInstance(application))
     val branches = branchRepository.branches
 
+    var locationEngine: LocationEngine? = null
 
+    var currentLocation : Location? = null
 
     init {
         getGoldaBranches()
+
     }
 
     fun getGoldaBranches() {
         coroutineScope.launch {
             try {
                 branchRepository.refreshBranches()
+                initializeLocationEngine()
             } catch (e: Exception) {
                 // Probably no internet connection
             }
@@ -108,6 +116,36 @@ class MapViewModel(val application: Application) : ViewModel() {
 
     fun doneFocusOnUserLocation(){
         _focusOnUserLocation.value = false;
+    }
+
+    override fun onLocationChanged(location: Location?) {
+        location?.run {
+            alertIfNeeded(this)
+            currentLocation = this
+        }
+    }
+
+    override fun onConnected() {
+        locationEngine?.requestLocationUpdates()
+    }
+
+    @SuppressWarnings("MissingPermission")
+    fun initializeLocationEngine() {
+        locationEngine = LocationEngineProvider(application).obtainBestLocationEngineAvailable()// Get the location
+        locationEngine?.priority = LocationEnginePriority.HIGH_ACCURACY
+        locationEngine?.activate()
+        locationEngine?.addLocationEngineListener(this)
+
+        val lastLocation = locationEngine?.lastLocation
+        if (lastLocation != null) {
+            currentLocation = lastLocation
+        } else {
+            locationEngine?.addLocationEngineListener(this)
+        }
+    }
+
+    fun currentLocation():Location?{
+        return currentLocation
     }
 
 }

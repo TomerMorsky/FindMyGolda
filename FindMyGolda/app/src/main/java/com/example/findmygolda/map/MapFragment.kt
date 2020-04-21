@@ -16,14 +16,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.findmygolda.R
 import com.example.findmygolda.database.BranchEntity
 import com.example.findmygolda.databinding.FragmentMapBinding
-import com.example.findmygolda.network.BranchProperty
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
-import com.mapbox.android.core.location.LocationEngine
-import com.mapbox.android.core.location.LocationEngineListener
-import com.mapbox.android.core.location.LocationEnginePriority
-import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
@@ -35,7 +30,7 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 
-class MapFragment : Fragment(), LocationEngineListener, OnMapReadyCallback {
+class MapFragment : Fragment(), OnMapReadyCallback {
     lateinit var mapView: MapView
     lateinit var mapViewModel: MapViewModel
 
@@ -44,9 +39,6 @@ class MapFragment : Fragment(), LocationEngineListener, OnMapReadyCallback {
 
     lateinit var map: MapboxMap
 
-    var originLocation: Location? = null
-
-    var locationEngine: LocationEngine? = null
     var locationComponent: LocationComponent? = null
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -84,7 +76,8 @@ class MapFragment : Fragment(), LocationEngineListener, OnMapReadyCallback {
 
         mapViewModel.focusOnUserLocation.observe(viewLifecycleOwner, Observer {
             if (it == true) {
-                originLocation?.let { it1 -> setCameraPosition(it1) }
+                mapViewModel.currentLocation()?.let { it1 -> setCameraPosition(it1) }
+               // mapViewModel.currentLocation?.let { it1 -> setCameraPosition(it1) }
                 mapViewModel.doneFocusOnUserLocation()
             }
         })
@@ -106,7 +99,6 @@ class MapFragment : Fragment(), LocationEngineListener, OnMapReadyCallback {
     override fun onStart() {
         super.onStart()
         if (PermissionsManager.areLocationPermissionsGranted(activity)) {
-            locationEngine?.requestLocationUpdates()
             locationComponent?.onStart()
         }
         mapView.onStart()
@@ -124,14 +116,12 @@ class MapFragment : Fragment(), LocationEngineListener, OnMapReadyCallback {
 
     override fun onStop() {
         super.onStop()
-        locationEngine?.removeLocationUpdates()
         locationComponent?.onStop()
         mapView.onStop()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        locationEngine?.deactivate()
         mapView.onDestroy()
     }
 
@@ -148,17 +138,6 @@ class MapFragment : Fragment(), LocationEngineListener, OnMapReadyCallback {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         mapView.onSaveInstanceState(outState)
-    }
-
-    override fun onLocationChanged(location: Location?) {
-        location?.run {
-            originLocation = this
-            mapViewModel.alertIfNeeded(this)
-        }
-    }
-
-    override fun onConnected() {
-        locationEngine?.requestLocationUpdates()
     }
 
     override fun onMapReady(mapboxMap: MapboxMap?) {
@@ -196,26 +175,8 @@ class MapFragment : Fragment(), LocationEngineListener, OnMapReadyCallback {
     fun enableLocation() {
         if (PermissionsManager.areLocationPermissionsGranted(activity)) {
             // Show the user location on map
-            initializeLocationComponent()
-            initializeLocationEngine()
+           initializeLocationComponent()
         }
-    }
-
-    @SuppressWarnings("MissingPermission")
-    fun initializeLocationEngine() {
-        locationEngine = LocationEngineProvider(activity).obtainBestLocationEngineAvailable()// Get the location
-        locationEngine?.priority = LocationEnginePriority.HIGH_ACCURACY
-        locationEngine?.activate()
-        locationEngine?.addLocationEngineListener(this)
-
-        val lastLocation = locationEngine?.lastLocation
-        if (lastLocation != null) {
-            originLocation = lastLocation
-            setCameraPosition(lastLocation)
-        } else {
-            locationEngine?.addLocationEngineListener(this)
-        }
-
     }
 
     @SuppressWarnings("MissingPermission")
