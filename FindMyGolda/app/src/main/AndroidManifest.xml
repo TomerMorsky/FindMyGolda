@@ -7,6 +7,7 @@
 
     <application
         android:allowBackup="true"
+        android:name=".FindMyGoldaApplication"
         android:icon="@drawable/golda_imag"
         android:label="@string/app_name"
         android:roundIcon="@drawable/golda_imag"
