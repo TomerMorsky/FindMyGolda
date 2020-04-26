@@ -9,9 +9,7 @@ import com.example.findmygolda.BranchesRepository
 import com.example.findmygolda.alerts.NotificationHelper
 import com.example.findmygolda.database.AlertDatabase
 import com.example.findmygolda.database.AlertEntity
-import com.example.findmygolda.database.BranchEntity
 import com.example.findmygolda.network.BranchManager
-import com.example.findmygolda.network.BranchProperty
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEnginePriority
@@ -20,7 +18,10 @@ import kotlinx.coroutines.*
 import java.lang.Exception
 
 const val MIN_TIME_BETWEEN_ALERTS = 300000L
-class MapViewModel(val application: Application) : ViewModel(), LocationEngineListener {
+class MapViewModel(val application: Application,
+                   var maxDistanceFromBranch: Int = 500,
+                   var minTimeBetweenAlers: Long = MIN_TIME_BETWEEN_ALERTS) : ViewModel(), LocationEngineListener {
+
 
     private val _response = MutableLiveData<String>()
     val response: LiveData<String>
@@ -73,7 +74,7 @@ class MapViewModel(val application: Application) : ViewModel(), LocationEngineLi
         val dataSource = (AlertDatabase.getInstance(application)).alertDatabaseDAO
         if (branches != null) {
             for(branch in branches){
-                if(branchManager.isDistanceLessThen500Meters(location, branch)){
+                if(branchManager.isDistanceInRange(location, branch, maxDistanceFromBranch)){
                     coroutineScope.launch{
                         withContext(Dispatchers.IO){
                             // saving to the room
@@ -94,7 +95,7 @@ class MapViewModel(val application: Application) : ViewModel(), LocationEngineLi
     private fun hasTimePast(lastAlert : AlertEntity?): Boolean {
         if (lastAlert == null)
             return true
-        return (System.currentTimeMillis() - lastAlert.time) >= MIN_TIME_BETWEEN_ALERTS
+        return (System.currentTimeMillis() - lastAlert.time) >= minTimeBetweenAlers
     }
 
     override fun onCleared() {

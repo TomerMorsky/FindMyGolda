@@ -90,4 +90,7 @@ dependencies {
     def work_version = "1.0.1"
     implementation "android.arch.work:work-runtime-ktx:$work_version"
 
+    implementation "androidx.preference:preference-ktx:1.1.1"
+
+
 }

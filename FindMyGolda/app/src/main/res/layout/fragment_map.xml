@@ -36,7 +36,7 @@
                 android:src="@drawable/icon_focus_on_user_location"
                 android:onClick="@{() -> viewModel.focusOnUserLocationClicked()}"
                 android:clickable="true"
-                mapbox:backgroundTint="@color/primaryLightColor"
+                mapbox:backgroundTint="@color/secondaryColor"
                 mapbox:layout_constraintBottom_toBottomOf="parent"
                 mapbox:layout_constraintEnd_toEndOf="parent"
                 mapbox:maxImageSize="45dp" />
@@ -49,7 +49,7 @@
                 android:src="@drawable/icon_notifications"
                 android:onClick="@{() -> viewModel.onAlertsButtonClicked()}"
                 android:clickable="true"
-                mapbox:backgroundTint="@color/primaryLightColor"
+                mapbox:backgroundTint="@color/secondaryColor"
                 mapbox:layout_constraintBottom_toTopOf="@+id/focusOnUserLocationButton"
                 mapbox:layout_constraintEnd_toEndOf="parent"
                 mapbox:maxImageSize="45dp" />

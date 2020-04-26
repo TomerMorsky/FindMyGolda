@@ -12,11 +12,20 @@
         tools:layout="@layout/fragment_map" >
         <action
             android:id="@+id/action_mapFragment_to_alertsFragment"
-            app:destination="@id/alertsFragment" />
+            app:destination="@id/alertsFragment"
+            app:enterAnim="@anim/nav_default_pop_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+        <action
+            android:id="@+id/action_mapFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/alertsFragment"
         android:name="com.example.findmygolda.alerts.AlertsFragment"
         android:label="fragment_alerts"
         tools:layout="@layout/fragment_alerts" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.findmygolda.settings.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>

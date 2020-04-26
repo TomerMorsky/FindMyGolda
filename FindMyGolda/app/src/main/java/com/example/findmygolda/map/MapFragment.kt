@@ -12,7 +12,9 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import com.example.findmygolda.R
 import com.example.findmygolda.database.BranchEntity
 import com.example.findmygolda.databinding.FragmentMapBinding
@@ -61,7 +63,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         Mapbox.getInstance(activity, getString(R.string.mapbox_access_token))
 
         val application = requireNotNull(this.activity).application
-        val viewModelFactory = MapViewModelFactory(application)
+
+        val preferences = PreferenceManager.getDefaultSharedPreferences(application)
+        val maxDistanceFromBranch = preferences.getInt("radiusFromBranch", 5).times(100)
+        val minTimeBetweenAlerts = parseMinutesToMilliseconds(preferences.getInt("timeBetweenNotifications", 1).times(5))
+
+        val viewModelFactory = MapViewModelFactory(application, maxDistanceFromBranch, minTimeBetweenAlerts)
 
         mapViewModel =
             ViewModelProviders.of(
@@ -84,7 +91,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         mapViewModel.navigateToAlertsFragment.observe(viewLifecycleOwner, Observer {
             if (it == true) {
-                this.findNavController()
+                NavHostFragment.findNavController(this)
                     .navigate(R.id.action_mapFragment_to_alertsFragment)
                 mapViewModel.doneNavigateToAlertsFragment()
             }
@@ -199,4 +206,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         map.addMarker(MarkerOptions().setTitle(branch.name).setSnippet(branch.address).position(point))
     }
 
+    fun parseMinutesToMilliseconds(minutes : Int) : Long{
+        return (minutes * 60000).toLong()
+    }
 }

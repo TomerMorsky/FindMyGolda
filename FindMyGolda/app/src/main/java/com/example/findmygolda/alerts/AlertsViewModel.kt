@@ -14,6 +14,7 @@ class AlertsViewModel(
     private var viewModelJob = Job()
     val alerts = database.getAllAlerts()
 
+
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()

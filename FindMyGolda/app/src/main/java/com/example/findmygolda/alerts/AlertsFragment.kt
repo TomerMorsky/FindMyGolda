@@ -42,8 +42,11 @@ class AlertsFragment : Fragment() {
         val adapter = AlertAdapter()
         binding.alertsList.adapter = adapter
 
+
+
         alertsTrackerViewModel.alerts.observe(viewLifecycleOwner, Observer {
             it?.let {
+                binding.isThereNotifications = it.isNotEmpty()
                 adapter.data = it
             }
         })

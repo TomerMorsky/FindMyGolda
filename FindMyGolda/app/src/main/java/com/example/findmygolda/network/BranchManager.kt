@@ -20,11 +20,11 @@ class BranchManager() {
 //        }
     }
 
-    fun isDistanceLessThen500Meters(location: Location, branch: BranchEntity): Boolean{
+    fun isDistanceInRange(location: Location, branch: BranchEntity, range:Int): Boolean{
         val branchLocation = Location("")
         branchLocation.latitude = branch.latitude
         branchLocation.longitude = branch.longtitude
-        return (location!!.distanceTo(branchLocation) <= 500)
+        return (location!!.distanceTo(branchLocation) <= range)
     }
 
     suspend fun getGoldaBranches(): List<BranchEntity>? {
