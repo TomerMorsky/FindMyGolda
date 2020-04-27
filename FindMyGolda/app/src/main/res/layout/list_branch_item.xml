@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="branch"
+            type="com.example.findmygolda.database.BranchEntity"/>
+        <variable
+            name="clickListener"
+            type="com.example.findmygolda.branches.BranchAdapter.BranchClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="@{() -> clickListener.onClick(branch)}"
+        android:clickable="true">
+
+        <ImageView
+            android:id="@+id/branch_imageView"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_margin="15dp"
+            android:layout_marginStart="40dp"
+            android:contentDescription="icecreamicon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/golda_imag" />
+
+        <TextView
+            android:id="@+id/branch_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:textSize="18sp"
+            android:text="@{branch.name}"
+            app:layout_constraintStart_toEndOf="@+id/branch_imageView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/branch_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@{branch.address}"
+            app:layout_constraintStart_toEndOf="@+id/branch_imageView"
+            app:layout_constraintTop_toBottomOf="@+id/branch_name" />
+
+        <TextView
+            android:id="@+id/branch_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:text="@{branch.phone}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/branch_imageView"
+            app:layout_constraintTop_toBottomOf="@+id/branch_address" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

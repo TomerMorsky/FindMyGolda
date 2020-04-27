@@ -127,16 +127,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.onStop()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView.onDestroy()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mapView.onDestroy()
-    }
-
     override fun onLowMemory() {
         super.onLowMemory()
         mapView.onLowMemory()
@@ -149,7 +139,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap?) {
         map = mapboxMap ?: return
-
         mapViewModel.branches.observe(viewLifecycleOwner, Observer { branches ->
             for (branch in branches) {
                 addGoldaMarker(branch)
@@ -171,9 +160,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val statusCode = (it as ApiException).statusCode
 
                 if (statusCode == LocationSettingsStatusCodes.RESOLUTION_REQUIRED) {
-                    val resolvableException = it as? ResolvableApiException
-                    startIntentSenderForResult(resolvableException?.getResolution()?.getIntentSender(),
-                        REQUEST_CHECK_SETTINGS, null, 0, 0, 0, null)
+                     //responsible for gps to turn on
+//                    val resolvableException = it as? ResolvableApiException
+//                    startIntentSenderForResult(resolvableException?.getResolution()?.getIntentSender(),
+//                        REQUEST_CHECK_SETTINGS, null, 0, 0, 0, null)
                 }
             }
         }

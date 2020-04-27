@@ -3,4 +3,5 @@
     <item android:title="settings" android:id="@+id/settingsFragment"
         />
     <item android:title="alerts" android:id="@+id/alertsFragment"/>
+    <item android:title="branches" android:id="@+id/branchesFragment"/>
 </menu>

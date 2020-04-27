@@ -1,16 +1,16 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/primaryLightColor</item>
-        <item name="preferenceTheme">@style/AppTheme.PreferenceTheme</item>
+<!--        <item name="preferenceTheme">@style/AppTheme.PreferenceTheme</item>-->
 
     </style>
 
-    <style name="AppTheme.PreferenceTheme" parent="PreferenceThemeOverlay.v14.Material">
-        <item name="colorAccent">#3E56DF</item>
-    </style>
+<!--    <style name="AppTheme.PreferenceTheme" parent="PreferenceThemeOverlay.v14.Material">-->
+<!--        <item name="colorAccent">#3E56DF</item>-->
+<!--    </style>-->
 </resources>

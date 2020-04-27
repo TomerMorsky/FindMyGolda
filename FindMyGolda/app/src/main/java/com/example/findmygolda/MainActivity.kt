@@ -1,8 +1,13 @@
 package com.example.findmygolda
 
+import android.content.Context
+import android.content.Intent
+import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavDestination
@@ -13,6 +18,8 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.findmygolda.databinding.ActivityMainBinding
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.yesButton
 
 class MainActivity : AppCompatActivity(), PermissionsListener {
     lateinit var permissionManager: PermissionsManager
@@ -27,6 +34,10 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             // If there is no permissions ask for them
             permissionManager = PermissionsManager(this)
             permissionManager.requestLocationPermissions(this)
+        }
+
+        if (!isLocationEnabled(applicationContext)) {
+            showLocationIsDisabledAlert()
         }
 
     }
@@ -70,7 +81,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
         // then setup the action bar, tell it about the DrawerLayout
         setupActionBarWithNavController(navController, binding.drawerLayout)
 
-
         // finally setup the left drawer (called a NavigationView)
         binding.navigationView.setupWithNavController(navController)
 
@@ -79,5 +89,24 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             toolBar.setDisplayShowTitleEnabled(false)
             binding.heroImage.visibility = View.VISIBLE
         }
+    }
+    private fun isLocationEnabled(mContext: Context): Boolean {
+        val lm = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return lm.isProviderEnabled(LocationManager.GPS_PROVIDER) || lm.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER)
+    }
+
+    private fun showLocationIsDisabledAlert() {
+        alert("We can't show your position because you disabled the location service for your device.") {
+            yesButton {
+                finish()
+                moveTaskToBack(true)
+                android.os.Process.killProcess(android.os.Process.myPid())
+                System.exit(1)
+            }
+            neutralPressed("Settings") {
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
+        }.show()
     }
 }

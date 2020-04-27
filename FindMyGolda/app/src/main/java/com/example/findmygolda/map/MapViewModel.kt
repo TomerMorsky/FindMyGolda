@@ -22,14 +22,9 @@ class MapViewModel(val application: Application,
                    var maxDistanceFromBranch: Int = 500,
                    var minTimeBetweenAlers: Long = MIN_TIME_BETWEEN_ALERTS) : ViewModel(), LocationEngineListener {
 
-
     private val _response = MutableLiveData<String>()
     val response: LiveData<String>
         get() = _response
-
-//    private val _branches = MutableLiveData<List<BranchEntity>>()
-//    val branches: LiveData<List<BranchEntity>>
-//        get() = _branches
 
     private val _focusOnUserLocation = MutableLiveData<Boolean?>()
     val focusOnUserLocation: LiveData<Boolean?>
