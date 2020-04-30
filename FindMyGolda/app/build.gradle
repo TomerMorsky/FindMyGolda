@@ -53,6 +53,7 @@ dependencies {
     implementation "android.arch.navigation:navigation-ui-ktx:$navigationVersion"
 
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.8.1'
+//    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.1.0'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
 
 

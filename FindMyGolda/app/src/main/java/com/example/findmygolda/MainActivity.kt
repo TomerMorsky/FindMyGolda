@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavDestination
@@ -24,11 +23,14 @@ import org.jetbrains.anko.yesButton
 class MainActivity : AppCompatActivity(), PermissionsListener {
     lateinit var permissionManager: PermissionsManager
     lateinit var binding: ActivityMainBinding
+    var locationServices : com.example.findmygolda.location.LocationManager? = null
+        get() = locationServices
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+            locationServices = com.example.findmygolda.location.LocationManager(application)
             setupNavigation()
         } else {
             // If there is no permissions ask for them
@@ -75,7 +77,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
     private fun setupNavigation() {
         // first find the nav controller
         val navController = findNavController(R.id.myNavHostFragment)
-
         setSupportActionBar(binding.toolbar)
 
         // then setup the action bar, tell it about the DrawerLayout
@@ -90,7 +91,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             binding.heroImage.visibility = View.VISIBLE
         }
     }
-    private fun isLocationEnabled(mContext: Context): Boolean {
+     fun isLocationEnabled(mContext: Context): Boolean {
         val lm = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return lm.isProviderEnabled(LocationManager.GPS_PROVIDER) || lm.isProviderEnabled(
             LocationManager.NETWORK_PROVIDER)
