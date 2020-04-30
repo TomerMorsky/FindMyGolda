@@ -6,7 +6,6 @@ import androidx.work.WorkerParameters
 import com.example.findmygolda.BranchesRepository
 import com.example.findmygolda.database.AlertDatabase
 import retrofit2.HttpException
-import timber.log.Timber
 
 class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
     CoroutineWorker(appContext, params) {
@@ -16,7 +15,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
         val repository = BranchesRepository(database)
         try {
             repository.refreshBranches( )
-            Timber.d("Work request for sync is run")
+            //Timber.d("Work request for sync is run")
         } catch (e: HttpException) {
             return Result.retry()
         }

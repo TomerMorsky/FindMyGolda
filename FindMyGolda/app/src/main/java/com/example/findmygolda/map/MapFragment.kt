@@ -14,11 +14,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.NavHostFragment
 import androidx.preference.PreferenceManager
-import com.example.findmygolda.MainActivity
 import com.example.findmygolda.R
 import com.example.findmygolda.database.BranchEntity
 import com.example.findmygolda.databinding.FragmentMapBinding
-import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
@@ -26,33 +24,22 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponent
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.LocationComponentOptions
 import com.mapbox.mapboxsdk.location.modes.CameraMode
+import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
+import com.mapbox.mapboxsdk.maps.Style
 
 class MapFragment : Fragment(), OnMapReadyCallback {
     lateinit var mapView: MapView
     lateinit var mapViewModel: MapViewModel
-
-    val REQUEST_CHECK_SETTINGS = 1
-    var settingsClient: SettingsClient? = null
-
     lateinit var map: MapboxMap
-
     var locationComponent: LocationComponent? = null
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_CHECK_SETTINGS) {
-            if (resultCode == Activity.RESULT_OK) {
-                enableLocation()
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                activity?.finish()
-            }
-        }
-    }
+    private lateinit var application: Context
+    private lateinit var currentLocation: Location
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,6 +48,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val activity = activity as Context
         Mapbox.getInstance(activity, getString(R.string.mapbox_access_token))
 
+        application = requireNotNull(this.activity).application
         val application = requireNotNull(this.activity).application
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(application)
@@ -79,14 +67,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         binding.viewModel = mapViewModel
 
         mapView.onCreate(savedInstanceState)
-
-        mapViewModel.focusOnUserLocation.observe(viewLifecycleOwner, Observer {
-            if (it == true) {
-                mapViewModel.currentLocation()?.let { it1 -> setCameraPosition(it1) }
-               // mapViewModel.currentLocation?.let { it1 -> setCameraPosition(it1) }
-                mapViewModel.doneFocusOnUserLocation()
-            }
-        })
+        mapView.getMapAsync(this)
 
         mapViewModel.navigateToAlertsFragment.observe(viewLifecycleOwner, Observer {
             if (it == true) {
@@ -96,16 +77,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         })
 
-        mapView.getMapAsync(this)
-        settingsClient = LocationServices.getSettingsClient(this.activity!!)
-
         return binding.root
     }
 
     override fun onStart() {
         super.onStart()
-        // Check if the user dose not turn off the GPS
-        //val jjjjjj = context?.let { (activity as MainActivity).isLocationEnabled(it) }
         if (PermissionsManager.areLocationPermissionsGranted(activity)) {
             locationComponent?.onStart()
         }
@@ -138,51 +114,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.onSaveInstanceState(outState)
     }
 
-    override fun onMapReady(mapboxMap: MapboxMap?) {
-        map = mapboxMap ?: return
-        mapViewModel.branches.observe(viewLifecycleOwner, Observer { branches ->
-            for (branch in branches) {
-                addGoldaMarker(branch)
-            }
-        })
-
-        val locationRequestBuilder = LocationSettingsRequest.Builder().addLocationRequest(
-            LocationRequest()
-            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY))
-
-        val locationRequest = locationRequestBuilder?.build()
-
-        settingsClient?.checkLocationSettings(locationRequest)?.run {
-            addOnSuccessListener {
-                enableLocation()
-            }
-
-            addOnFailureListener {
-                val statusCode = (it as ApiException).statusCode
-
-                if (statusCode == LocationSettingsStatusCodes.RESOLUTION_REQUIRED) {
-                     //responsible for gps to turn on
-//                    val resolvableException = it as? ResolvableApiException
-//                    startIntentSenderForResult(resolvableException?.getResolution()?.getIntentSender(),
-//                        REQUEST_CHECK_SETTINGS, null, 0, 0, 0, null)
-                }
-            }
-        }
-    }
-
-    fun enableLocation() {
-        if (PermissionsManager.areLocationPermissionsGranted(activity)) {
-            // Show the user location on map
-           initializeLocationComponent()
-        }
-    }
-
     @SuppressWarnings("MissingPermission")
-    fun initializeLocationComponent() {
-        locationComponent = map.locationComponent
-        locationComponent?.activateLocationComponent(activity!!)
-        locationComponent?.isLocationComponentEnabled = true
-        locationComponent?.cameraMode = CameraMode.TRACKING
+    fun initializeLocationComponent(loadedMapStyle: Style) {
+        val customLocationComponentOptions = LocationComponentOptions.builder(application)
+            .trackingGesturesManagement(true)
+            .build()
+
+        val locationComponentActivationOptions =
+            LocationComponentActivationOptions.builder(application, loadedMapStyle)
+                .locationComponentOptions(customLocationComponentOptions)
+                .build()
+
+        map.locationComponent.apply {
+            activateLocationComponent(locationComponentActivationOptions)
+            isLocationComponentEnabled = true
+            cameraMode = CameraMode.TRACKING
+            renderMode = RenderMode.COMPASS
+        }
     }
 
     fun setCameraPosition(location: Location) {
@@ -199,5 +147,31 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     fun parseMinutesToMilliseconds(minutes : Int) : Long{
         return (minutes * 60000).toLong()
+    }
+
+    override fun onMapReady(mapboxMap: MapboxMap) {
+        map = mapboxMap
+        mapViewModel.branches.observe(viewLifecycleOwner, Observer { branches ->
+            for (branch in branches) {
+                addGoldaMarker(branch)
+            }
+        })
+
+        mapboxMap.setStyle(Style.MAPBOX_STREETS) {
+            initializeLocationComponent(it)
+            mapViewModel.locationManager.currentLocation.observe(viewLifecycleOwner, Observer { newLocation ->
+                map.locationComponent.forceLocationUpdate(newLocation)
+                newLocation?.let { mapViewModel.alertIfNeeded(it) }
+                if (newLocation != null) {
+                    currentLocation = newLocation
+                }
+            })
+            mapViewModel.focusOnUserLocation.observe(viewLifecycleOwner, Observer {
+                if (it == true) {
+                    setCameraPosition(currentLocation)
+                    mapViewModel.doneFocusOnUserLocation()
+                }
+            })
+        }
     }
 }

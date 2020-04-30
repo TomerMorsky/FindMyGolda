@@ -15,6 +15,7 @@ import androidx.navigation.ui.NavigationUI.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.findmygolda.databinding.ActivityMainBinding
+import com.example.findmygolda.location.LocationAdapter
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import org.jetbrains.anko.alert
@@ -23,24 +24,26 @@ import org.jetbrains.anko.yesButton
 class MainActivity : AppCompatActivity(), PermissionsListener {
     lateinit var permissionManager: PermissionsManager
     lateinit var binding: ActivityMainBinding
-    var locationServices : com.example.findmygolda.location.LocationManager? = null
+    var locationServices : LocationAdapter? = null
         get() = locationServices
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
-            binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-            locationServices = com.example.findmygolda.location.LocationManager(application)
-            setupNavigation()
+            if (!isLocationEnabled(applicationContext)) {
+                showLocationIsDisabledAlert()
+            } else {
+                binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+                locationServices = LocationAdapter(application)
+                setupNavigation()
+            }
         } else {
             // If there is no permissions ask for them
             permissionManager = PermissionsManager(this)
             permissionManager.requestLocationPermissions(this)
         }
 
-        if (!isLocationEnabled(applicationContext)) {
-            showLocationIsDisabledAlert()
-        }
+
 
     }
 

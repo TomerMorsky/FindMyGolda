@@ -13,7 +13,6 @@ import com.example.findmygolda.worker.RefreshDataWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 
@@ -48,7 +47,7 @@ class FindMyGoldaApplication:Application() {
 
     private fun delayedInit() {
         applicationScope.launch {
-            Timber.plant(Timber.DebugTree())
+            //Timber.plant(Timber.DebugTree())
             setupRecurringWork()
         }
     }
