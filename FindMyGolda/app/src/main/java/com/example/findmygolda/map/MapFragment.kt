@@ -13,13 +13,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import com.example.findmygolda.MainActivity
 import com.example.findmygolda.R
 import com.example.findmygolda.database.BranchEntity
 import com.example.findmygolda.databinding.FragmentMapBinding
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
@@ -105,6 +104,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onStart() {
         super.onStart()
+        // Check if the user dose not turn off the GPS
+        //val jjjjjj = context?.let { (activity as MainActivity).isLocationEnabled(it) }
         if (PermissionsManager.areLocationPermissionsGranted(activity)) {
             locationComponent?.onStart()
         }
@@ -127,16 +128,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mapView.onStop()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView.onDestroy()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mapView.onDestroy()
-    }
-
     override fun onLowMemory() {
         super.onLowMemory()
         mapView.onLowMemory()
@@ -149,7 +140,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap?) {
         map = mapboxMap ?: return
-
         mapViewModel.branches.observe(viewLifecycleOwner, Observer { branches ->
             for (branch in branches) {
                 addGoldaMarker(branch)
@@ -171,9 +161,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val statusCode = (it as ApiException).statusCode
 
                 if (statusCode == LocationSettingsStatusCodes.RESOLUTION_REQUIRED) {
-                    val resolvableException = it as? ResolvableApiException
-                    startIntentSenderForResult(resolvableException?.getResolution()?.getIntentSender(),
-                        REQUEST_CHECK_SETTINGS, null, 0, 0, 0, null)
+                     //responsible for gps to turn on
+//                    val resolvableException = it as? ResolvableApiException
+//                    startIntentSenderForResult(resolvableException?.getResolution()?.getIntentSender(),
+//                        REQUEST_CHECK_SETTINGS, null, 0, 0, 0, null)
                 }
             }
         }

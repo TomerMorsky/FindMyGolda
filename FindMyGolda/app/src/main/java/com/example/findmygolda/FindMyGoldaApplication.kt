@@ -1,7 +1,13 @@
 package com.example.findmygolda
 
 import android.app.Application
+import android.content.Context
+import android.content.Intent
+import android.location.LocationManager
 import android.os.Build
+import android.provider.Settings
+import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import androidx.work.*
 import com.example.findmygolda.worker.RefreshDataWorker
 import kotlinx.coroutines.CoroutineScope
@@ -9,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+
 
 class FindMyGoldaApplication:Application() {
     private val applicationScope = CoroutineScope(Dispatchers.Default)
@@ -45,4 +52,5 @@ class FindMyGoldaApplication:Application() {
             setupRecurringWork()
         }
     }
+
 }

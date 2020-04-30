@@ -18,6 +18,9 @@
         <action
             android:id="@+id/action_mapFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_branchesFragment"
+            app:destination="@id/branchesFragment" />
     </fragment>
     <fragment
         android:id="@+id/alertsFragment"
@@ -28,4 +31,9 @@
         android:id="@+id/settingsFragment"
         android:name="com.example.findmygolda.settings.SettingsFragment"
         android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/branchesFragment"
+        android:name="com.example.findmygolda.branches.BranchesFragment"
+        android:label="fragment_branches"
+        tools:layout="@layout/fragment_branches" />
 </navigation>
