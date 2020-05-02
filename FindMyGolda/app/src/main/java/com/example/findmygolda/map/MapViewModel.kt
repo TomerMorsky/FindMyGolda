@@ -43,77 +43,15 @@ class MapViewModel(val application: Application,
     val navigateToAlertsFragment: LiveData<Boolean?>
         get() = _navigateToAlertsFragment
 
-    private var viewModelJob = Job()
-    private val coroutineScope = CoroutineScope(
-        viewModelJob + Dispatchers.Main )
-
-    //private val branchManager = BranchManager(application)
-
-    private val branchRepository = BranchesRepository(AlertDatabase.getInstance(application))
-    val branches = branchRepository.branches
-
-    var locationEngine: LocationEngine? = null
-
-//    private val _currentLocation = MutableLiveData<Location?>()
-//    var currentLocation : LiveData<Location?>
-//        get() = _currentLocation
-
-    private lateinit var mainActivity: MainActivity
-
     var  locationManager : LocationAdapter
 
     init {
-        getGoldaBranches()
+        //getGoldaBranches()
         locationManager = LocationAdapter(application,alertManager)
         //currentLocation = locationManager.currentLocation
         //mainActivity = requireNotNull(application) as MainActivity
 
 
-    }
-
-    private fun getGoldaBranches() {
-        coroutineScope.launch {
-            try {
-                branchRepository.refreshBranches()
-            } catch (e: Exception) {
-                // Probably no internet connection
-            }
-
-        }
-    }
-
-//    fun alertIfNeeded(location: Location){
-//        val branches = branches.value
-//        val dataSource = (AlertDatabase.getInstance(application)).alertDatabaseDAO
-//        if (branches != null) {
-//            for(branch in branches){
-//                if(branchManager.isDistanceInRange(location, branch, maxDistanceFromBranch)){
-//                    coroutineScope.launch{
-//                        withContext(Dispatchers.IO){
-//                            // saving to the room
-//                            val lastAlert = dataSource.getLastAlertOfBranch(branch.id.toInt())
-//                            if(hasTimePast(lastAlert)){
-//                                dataSource.insert(AlertEntity(title = branch.name,
-//                                    description = branch.discounts,
-//                                    branchId = branch.id.toInt()))
-//                                NotificationHelper(application.applicationContext).createNotification(branch.name, branch.discounts)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    private fun hasTimePast(lastAlert : AlertEntity?): Boolean {
-//        if (lastAlert == null)
-//            return true
-//        return (System.currentTimeMillis() - lastAlert.time) >= minTimeBetweenAlers
-//    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
     }
 
     fun onAlertsButtonClicked(){
@@ -131,5 +69,4 @@ class MapViewModel(val application: Application,
     fun doneFocusOnUserLocation(){
         _focusOnUserLocation.value = false;
     }
-
 }

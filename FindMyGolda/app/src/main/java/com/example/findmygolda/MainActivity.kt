@@ -28,19 +28,17 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
     lateinit var binding: ActivityMainBinding
     lateinit var branchManager :BranchManager
     lateinit var alerManager : AlertManager
-//    var locationServices : LocationAdapter? = null
-//        get() = locationServices
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             if (!isLocationEnabled(applicationContext)) {
                 showLocationIsDisabledAlert()
             } else {
-                binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-               // locationServices = LocationAdapter(application)
                 branchManager = BranchManager(application)
                 alerManager = AlertManager(application, branchManager)
+                binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
                 setupNavigation()
             }
         } else {
@@ -48,9 +46,6 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             permissionManager = PermissionsManager(this)
             permissionManager.requestLocationPermissions(this)
         }
-
-
-
     }
 
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {

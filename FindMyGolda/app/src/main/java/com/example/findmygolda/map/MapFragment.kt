@@ -158,7 +158,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         map = mapboxMap
-        mapViewModel.branches.observe(viewLifecycleOwner, Observer { branches ->
+        mainActivity.branchManager.branches.observe(viewLifecycleOwner, Observer { branches ->
             for (branch in branches) {
                 addGoldaMarker(branch)
             }
@@ -168,7 +168,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             initializeLocationComponent(it)
             mapViewModel.locationManager.currentLocation.observe(viewLifecycleOwner, Observer { newLocation ->
                 map.locationComponent.forceLocationUpdate(newLocation)
-                //newLocation?.let { mapViewModel.alertIfNeeded(it) }
                 if (newLocation != null) {
                     currentLocation = newLocation
                 }
