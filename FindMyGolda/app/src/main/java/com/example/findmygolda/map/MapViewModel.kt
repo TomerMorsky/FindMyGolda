@@ -12,6 +12,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.example.findmygolda.BranchesRepository
 import com.example.findmygolda.MainActivity
 import com.example.findmygolda.R
+import com.example.findmygolda.alerts.AlertManager
 import com.example.findmygolda.alerts.NotificationHelper
 import com.example.findmygolda.database.AlertDatabase
 import com.example.findmygolda.database.AlertEntity
@@ -27,7 +28,8 @@ import kotlin.properties.Delegates
 const val MIN_TIME_BETWEEN_ALERTS = 300000L
 class MapViewModel(val application: Application,
                    var maxDistanceFromBranch: Int = 500,
-                   var minTimeBetweenAlers: Long = MIN_TIME_BETWEEN_ALERTS) : ViewModel() {
+                   var minTimeBetweenAlers: Long = MIN_TIME_BETWEEN_ALERTS,
+                   val alertManager : AlertManager) : ViewModel() {
 
     private val _response = MutableLiveData<String>()
     val response: LiveData<String>
@@ -45,7 +47,7 @@ class MapViewModel(val application: Application,
     private val coroutineScope = CoroutineScope(
         viewModelJob + Dispatchers.Main )
 
-    private val branchManager = BranchManager()
+    //private val branchManager = BranchManager(application)
 
     private val branchRepository = BranchesRepository(AlertDatabase.getInstance(application))
     val branches = branchRepository.branches
@@ -62,18 +64,17 @@ class MapViewModel(val application: Application,
 
     init {
         getGoldaBranches()
-        locationManager = LocationAdapter(application)
+        locationManager = LocationAdapter(application,alertManager)
         //currentLocation = locationManager.currentLocation
         //mainActivity = requireNotNull(application) as MainActivity
 
 
     }
 
-    fun getGoldaBranches() {
+    private fun getGoldaBranches() {
         coroutineScope.launch {
             try {
                 branchRepository.refreshBranches()
-                //initializeLocationEngine()
             } catch (e: Exception) {
                 // Probably no internet connection
             }
@@ -81,34 +82,34 @@ class MapViewModel(val application: Application,
         }
     }
 
-    fun alertIfNeeded(location: Location){
-        val branches = branches.value
-        val dataSource = (AlertDatabase.getInstance(application)).alertDatabaseDAO
-        if (branches != null) {
-            for(branch in branches){
-                if(branchManager.isDistanceInRange(location, branch, maxDistanceFromBranch)){
-                    coroutineScope.launch{
-                        withContext(Dispatchers.IO){
-                            // saving to the room
-                            val lastAlert = dataSource.getLastAlertOfBranch(branch.id.toInt())
-                            if(hasTimePast(lastAlert)){
-                                dataSource.insert(AlertEntity(title = branch.name,
-                                    description = branch.discounts,
-                                    branchId = branch.id.toInt()))
-                                NotificationHelper(application.applicationContext).createNotification(branch.name, branch.discounts)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun hasTimePast(lastAlert : AlertEntity?): Boolean {
-        if (lastAlert == null)
-            return true
-        return (System.currentTimeMillis() - lastAlert.time) >= minTimeBetweenAlers
-    }
+//    fun alertIfNeeded(location: Location){
+//        val branches = branches.value
+//        val dataSource = (AlertDatabase.getInstance(application)).alertDatabaseDAO
+//        if (branches != null) {
+//            for(branch in branches){
+//                if(branchManager.isDistanceInRange(location, branch, maxDistanceFromBranch)){
+//                    coroutineScope.launch{
+//                        withContext(Dispatchers.IO){
+//                            // saving to the room
+//                            val lastAlert = dataSource.getLastAlertOfBranch(branch.id.toInt())
+//                            if(hasTimePast(lastAlert)){
+//                                dataSource.insert(AlertEntity(title = branch.name,
+//                                    description = branch.discounts,
+//                                    branchId = branch.id.toInt()))
+//                                NotificationHelper(application.applicationContext).createNotification(branch.name, branch.discounts)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    private fun hasTimePast(lastAlert : AlertEntity?): Boolean {
+//        if (lastAlert == null)
+//            return true
+//        return (System.currentTimeMillis() - lastAlert.time) >= minTimeBetweenAlers
+//    }
 
     override fun onCleared() {
         super.onCleared()
@@ -130,35 +131,5 @@ class MapViewModel(val application: Application,
     fun doneFocusOnUserLocation(){
         _focusOnUserLocation.value = false;
     }
-
-//    override fun onLocationChanged(location: Location?) {
-//        location?.run {
-//            alertIfNeeded(this)
-//            currentLocation = this
-//        }
-//    }
-//
-//    override fun onConnected() {
-//        locationEngine?.requestLocationUpdates()
-//    }
-//
-//    @SuppressWarnings("MissingPermission")
-//    fun initializeLocationEngine() {
-//        locationEngine = LocationEngineProvider(application).obtainBestLocationEngineAvailable()// Get the location
-//        locationEngine?.priority = LocationEnginePriority.HIGH_ACCURACY
-//        locationEngine?.activate()
-//        locationEngine?.addLocationEngineListener(this)
-//
-//        val lastLocation = locationEngine?.lastLocation
-//        if (lastLocation != null) {
-//            currentLocation = lastLocation
-//        } else {
-//            locationEngine?.addLocationEngineListener(this)
-//        }
-//    }
-//
-//    fun currentLocation():Location?{
-//        return currentLocation
-//    }
 
 }

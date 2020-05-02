@@ -14,8 +14,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.findmygolda.alerts.AlertManager
 import com.example.findmygolda.databinding.ActivityMainBinding
 import com.example.findmygolda.location.LocationAdapter
+import com.example.findmygolda.network.BranchManager
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import org.jetbrains.anko.alert
@@ -24,8 +26,10 @@ import org.jetbrains.anko.yesButton
 class MainActivity : AppCompatActivity(), PermissionsListener {
     lateinit var permissionManager: PermissionsManager
     lateinit var binding: ActivityMainBinding
-    var locationServices : LocationAdapter? = null
-        get() = locationServices
+    lateinit var branchManager :BranchManager
+    lateinit var alerManager : AlertManager
+//    var locationServices : LocationAdapter? = null
+//        get() = locationServices
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +38,9 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
                 showLocationIsDisabledAlert()
             } else {
                 binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-                locationServices = LocationAdapter(application)
+               // locationServices = LocationAdapter(application)
+                branchManager = BranchManager(application)
+                alerManager = AlertManager(application, branchManager)
                 setupNavigation()
             }
         } else {

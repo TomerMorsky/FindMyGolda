@@ -7,8 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.mapbox.android.core.location.*
 
-class LocationAdapter(val application: Application
-//                      val listenToLocationChange:ILocationChanged
+class LocationAdapter(val application: Application,
+                      val listenToLocationChange:ILocationChanged
                   ) {
     private lateinit var locationEngine: LocationEngine
     private val callback = LocationChangeListen()
@@ -40,7 +40,7 @@ class LocationAdapter(val application: Application
 
             if (result.lastLocation != null) {
                 val newLocation = Location(result.lastLocation)
-                //listenToLocationChange.LocationChanged(newLocation)
+                listenToLocationChange.LocationChanged(newLocation)
                 _currentLocation.value = newLocation
 //                mapboxMap.locationComponent.forceLocationUpdate(newLocation)
 //                viewModel.checkBranchDistance(newLocation)

@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.NavHostFragment
 import androidx.preference.PreferenceManager
+import com.example.findmygolda.MainActivity
 import com.example.findmygolda.R
 import com.example.findmygolda.database.BranchEntity
 import com.example.findmygolda.databinding.FragmentMapBinding
@@ -40,6 +41,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     var locationComponent: LocationComponent? = null
     private lateinit var application: Context
     private lateinit var currentLocation: Location
+    private lateinit var mainActivity: MainActivity
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,12 +53,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         application = requireNotNull(this.activity).application
         val application = requireNotNull(this.activity).application
+        mainActivity = activity as MainActivity
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(application)
         val maxDistanceFromBranch = preferences.getInt("radiusFromBranch", 5).times(100)
         val minTimeBetweenAlerts = parseMinutesToMilliseconds(preferences.getInt("timeBetweenNotifications", 1).times(5))
 
-        val viewModelFactory = MapViewModelFactory(application, maxDistanceFromBranch, minTimeBetweenAlerts)
+        val viewModelFactory = MapViewModelFactory(application,
+            maxDistanceFromBranch,
+            minTimeBetweenAlerts,
+            mainActivity.alerManager)
 
         mapViewModel =
             ViewModelProviders.of(
@@ -161,7 +168,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             initializeLocationComponent(it)
             mapViewModel.locationManager.currentLocation.observe(viewLifecycleOwner, Observer { newLocation ->
                 map.locationComponent.forceLocationUpdate(newLocation)
-                newLocation?.let { mapViewModel.alertIfNeeded(it) }
+                //newLocation?.let { mapViewModel.alertIfNeeded(it) }
                 if (newLocation != null) {
                     currentLocation = newLocation
                 }
